@@ -81,58 +81,58 @@ var subreddits = [
 var leaderboard = [];
 
 function orderByKarma(a, b) {
-	if (a.karma < b.karma) {
-		return 1;
-	}
-	if (a.karma > b.karma) {
-		return -1;
-	}
-	return 0;
+    if (a.karma < b.karma) {
+        return 1;
+    }
+    if (a.karma > b.karma) {
+        return -1;
+    }
+    return 0;
 }
 
 function getSubreddits(index) {
-	index = index ? index : 0; 
+    index = index ? index : 0; 
 
-	var subreddit = subreddits[index];
-	
-	var request = $.get('https://www.reddit.com/user/' + subreddit + '_SS/about.json');
+    var subreddit = subreddits[index];
+    
+    var request = $.get('https://www.reddit.com/user/' + subreddit + '_SS/about.json');
 
-	request.done(function(botData) {
-		leaderboard.push({
-			name: subreddit,
-			karma: botData.data.comment_karma
-		});
+    request.done(function(botData) {
+        leaderboard.push({
+            name: subreddit,
+            karma: botData.data.comment_karma
+        });
 
-		var loadingPercentage = (index + 1) / subreddits.length * 100;
+        var loadingPercentage = (index + 1) / subreddits.length * 100;
 
-		$('.progress-bar')
-			.css('width', loadingPercentage + '%')
-			.html(Math.floor(loadingPercentage) + '%');
-	});
+        $('.progress-bar')
+            .css('width', loadingPercentage + '%')
+            .html(Math.floor(loadingPercentage) + '%');
+    });
 
-	if (index < subreddits.length - 1) {
-		setTimeout(getSubreddits, 2000, index + 1);
-	} else {
-		setTimeout(displaySubreddits, 2000);
-	}
+    if (index < subreddits.length - 1) {
+        setTimeout(getSubreddits, 2000, index + 1);
+    } else {
+        setTimeout(displaySubreddits, 2000);
+    }
 }
 
 function displaySubreddits() {
-	leaderboard.sort(orderByKarma);
+    leaderboard.sort(orderByKarma);
 
-	$('.progress').remove();
+    $('.progress').remove();
 
-	for (var i = 0; i < leaderboard.length; i++) {
-		var subreddit = leaderboard[i];
+    for (var i = 0; i < leaderboard.length; i++) {
+        var subreddit = leaderboard[i];
 
-		$('.table > tbody').append(
-			'<tr>' +
-				'<td>' + (i + 1) + '</td>' +
-				'<td><a href="https://www.reddit.com/user/' + subreddit.name + '_SS">' + subreddit.name + '</a></td>' +
-				'<td>' + subreddit.karma + '</td>' +
-			'</tr>'
-		);
-	}
+        $('.table > tbody').append(
+            '<tr>' +
+                '<td>' + (i + 1) + '</td>' +
+                '<td><a href="https://www.reddit.com/user/' + subreddit.name + '_SS">' + subreddit.name + '</a></td>' +
+                '<td>' + subreddit.karma + '</td>' +
+            '</tr>'
+        );
+    }
 }
 
 getSubreddits();

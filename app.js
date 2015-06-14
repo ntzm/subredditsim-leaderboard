@@ -1,4 +1,4 @@
-var subreddits = [
+var subredditNames = [
     "2007scape",
     "4chan",
     "AdviceAnimals",
@@ -80,55 +80,55 @@ var subreddits = [
 
 var leaderboard = [];
 
-function orderByKarma(a, b) {
-    if (a.karma < b.karma) {
-        return 1;
-    }
-    if (a.karma > b.karma) {
-        return -1;
-    }
-    return 0;
-}
-
 function getSubreddits(index) {
-    index = index ? index : 0; 
+    index = index ? index : 0;
 
-    var subreddit = subreddits[index];
-    
-    var request = $.get('https://www.reddit.com/user/' + subreddit + '_SS/about.json');
+    var subredditName = subredditNames[index];
+
+    var request = $.ajax({
+        url: 'https://www.reddit.com/user/' + subredditName + '_SS/about.json'
+    });
 
     request.done(function(botData) {
         leaderboard.push({
-            name: subreddit,
+            name: subredditName,
             karma: botData.data.comment_karma
         });
 
-        var loadingPercentage = (index + 1) / subreddits.length * 100;
+        var loadingPercentage = (index + 1) / subredditNames.length * 100;
 
         $('.progress-bar')
             .css('width', loadingPercentage + '%')
             .html(Math.floor(loadingPercentage) + '%');
     });
 
-    if (index < subreddits.length - 1) {
+    if (index < subredditNames.length - 1) {
         setTimeout(getSubreddits, 2000, index + 1);
     } else {
-        setTimeout(displaySubreddits, 2000);
+        request.done(displaySubreddits);
     }
 }
 
 function displaySubreddits() {
-    leaderboard.sort(orderByKarma);
+    leaderboard.sort(function(a, b) {
+        if (a.karma < b.karma) {
+            return 1;
+        } else if (a.karma > b.karma) {
+            return -1;
+        } else {
+            return 0;
+        }
+    });
 
     $('.progress').remove();
 
     for (var i = 0; i < leaderboard.length; i++) {
         var subreddit = leaderboard[i];
 
-        $('.table > tbody').append(
+        $('tbody').append(
             '<tr>' +
                 '<td>' + (i + 1) + '</td>' +
-                '<td><a href="https://www.reddit.com/user/' + subreddit.name + '_SS">' + subreddit.name + '</a></td>' +
+                '<td><a href="https://www.reddit.com/user/' + subreddit.name +'_SS">' + subreddit.name + '</a></td>' +
                 '<td>' + subreddit.karma + '</td>' +
             '</tr>'
         );
